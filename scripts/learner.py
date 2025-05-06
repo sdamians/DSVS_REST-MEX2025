@@ -62,11 +62,11 @@ class Learner:
 
           input_ids = batch["input_ids"].to(self.device)
           attention_mask = batch["attention_mask"].to(self.device)
-          labels_town = batch["town"].to(self.device)
-          labels_polarity = batch["polarity"].to(self.device)
-          labels_type = batch["type"].to(self.device)
+          labels_town = batch["label_town"].to(self.device)
+          labels_polarity = batch["label_polarity"].to(self.device)
+          labels_type = batch["label_type"].to(self.device)
 
-          with t.cuda.amp.autocast():
+          with t.amp.autocast(device_type=self.device):
             outputs = self.model(input_ids, attention_mask=attention_mask)
 
             # We calculate the loss of the present minibatch
