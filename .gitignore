@@ -172,3 +172,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# Datasets path
+datasets/*
+!datasets/*.dvc
+config.env
+*.bkp.py
+submits/
+tests/*
