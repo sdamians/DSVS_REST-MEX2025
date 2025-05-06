@@ -30,7 +30,7 @@ class Learner:
     self.device = device
 
     self.criterion_type = nn.CrossEntropyLoss(weight=class_weights_type, **criterion_params_type)
-    self.criterion_polarity = OrdinalLoss() 
+    self.criterion_polarity = OrdinalLoss(criterion_params_polarity) 
     self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **criterion_params_town)    
 
   def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2):
@@ -201,8 +201,9 @@ class Learner:
   
 
 class OrdinalLoss(nn.Module):
-  def __init__(self):
+  def __init__(self, criterion_params):
     super().__init__()
+    self.criterion_params = criterion_params
   
   def forward(self, logits, labels):
     """
@@ -215,5 +216,5 @@ class OrdinalLoss(nn.Module):
     for k in range(num_outputs):
         cumulative_labels[:, k] = (labels > k).float()
 
-    loss = F.binary_cross_entropy_with_logits(logits, cumulative_labels, reduction='mean')
+    loss = F.binary_cross_entropy_with_logits(logits, cumulative_labels, **self.criterion_params)
     return loss

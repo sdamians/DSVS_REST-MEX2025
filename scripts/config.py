@@ -1,11 +1,12 @@
 params = {
-    "experiment_name": "SLM_binary_task_1",
+    "experiment_name": "MTL_RESTMEX",
     "dataset_version": "",
     "seed": 43,
-    "max_verses": 20,
     "model": {
-        "name": "bert_base_cased",
-        "num_labels": 2,
+        "name": "pysentimiento/robertuito-base-cased",
+        "n_labels_type": 3,
+        "n_labels_town": 40,
+        "n_labels_polarity": 5,
         "dropout": 0.01
     },
     "train": {
@@ -20,8 +21,18 @@ params = {
             "amsgrad": False
         },
         "criterion": {
-            "reduction": "sum", #mean
-            "label_smoothing": 0    
+            "type":{
+                "reduction": "mean", #sum
+                "label_smoothing": 0    
+            },
+            "town":{
+                "reduction": "mean", #sum
+                "label_smoothing": 0    
+            },
+            "polarity":{
+                "reduction": "mean", #sum
+                "label_smoothing": 0    
+            },
         },    
         "scheduler":{
             "num_cycles": 1.5
