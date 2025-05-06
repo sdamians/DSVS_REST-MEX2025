@@ -1,0 +1,6 @@
+outs:
+- md5: 3d2fcc18c6be2eee2ce77987bda3d7f1.dir
+  size: 32632596
+  nfiles: 3
+  hash: md5
+  path: restmex_mtl_v1_test
