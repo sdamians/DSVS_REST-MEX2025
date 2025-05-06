@@ -1,0 +1,4 @@
+[core]
+    remote = origin
+['remote "origin"']
+    url = https://dagshub.com/sdamians/DSVS_REST-MEX2025.dvc
