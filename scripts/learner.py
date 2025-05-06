@@ -46,7 +46,7 @@ class Learner:
         **self.scheduler_params  # Opcional: media onda de coseno (default)
     )
 
-    scaler = t.cuda.amp.GradScaler()
+    scaler = t.amp.GradScaler(device=self.device)
 
     # Training mode.
     self.model.train()

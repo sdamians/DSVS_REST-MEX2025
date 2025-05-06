@@ -4,12 +4,12 @@ from transformers import AutoModel
 
 #Multitask learning
 class MTLClassifier(nn.Module):
-    def __init__(self, modelpath, n_labels_type=2, n_labels_polarity=2, n_labels_town=2, dropout=0.05, device='cpu'):
+    def __init__(self, modelpath, n_labels_type=2, n_labels_polarity=2, n_labels_town=2, dropout=0.05):
         super().__init__()
 
         self.llm = AutoModel.from_pretrained(modelpath
                                             ,output_attentions=False
-                                            ,output_hidden_states=False).to(device)
+                                            ,output_hidden_states=False)
 
         self.dropout = nn.Dropout(dropout)
         
