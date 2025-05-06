@@ -144,9 +144,9 @@ class Learner:
 
         input_ids = batch["input_ids"].to(self.device)
         attention_mask = batch["attention_mask"].to(self.device)
-        labels_town = batch["labels_town"].to(self.device) if "labels_town" in batch else None
-        labels_type = batch["labels_type"].to(self.device) if "labels_type" in batch else None
-        labels_polarity = batch["labels_polarity"].to(self.device) if "labels_polarity" in batch else None
+        labels_town = batch["label_town"].to(self.device) if "label_town" in batch else None
+        labels_type = batch["label_type"].to(self.device) if "label_type" in batch else None
+        labels_polarity = batch["label_polarity"].to(self.device) if "label_polarity" in batch else None
 
         outputs = self.model(input_ids, attention_mask=attention_mask)
 
