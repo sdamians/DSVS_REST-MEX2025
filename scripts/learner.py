@@ -191,9 +191,9 @@ class Learner:
       metrics_polarity = get_metrics(val_polarity["labels"], val_polarity["preds"], None, promedio='macro')
 
       print(msg)
-      print(f"\tf1-score: {metrics_town['f1_score']}")
-      print(f"\tf1-score: {metrics_type['f1_score']}")
-      print(f"\tf1-score: {metrics_polarity['f1_score']}")
+      print(f"\ttown f1-score: {metrics_town['f1_score']}")
+      print(f"\ttype f1-score: {metrics_type['f1_score']}")
+      print(f"\tpolarity f1-score: {metrics_polarity['f1_score']}")
       
       print(f"\tValidation took: {format_time(time.time() - t0)}")
 
