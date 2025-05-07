@@ -76,7 +76,7 @@ class Learner:
             loss = loss_type + loss_town + loss_polarity
 
             batch_loss += loss.item()
-            pbar.set_postfix({ "loss": loss.item() })
+            pbar.set_postfix({ "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
             pbar.update(1)
 
           # Backpropagation
