@@ -30,8 +30,7 @@ params = {
                 "label_smoothing": 0    
             },
             "polarity":{
-                "reduction": "mean", #sum
-                "label_smoothing": 0    
+                "reduction": "mean", #sum  
             },
         },    
         "scheduler":{
