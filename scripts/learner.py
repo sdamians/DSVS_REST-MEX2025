@@ -127,7 +127,7 @@ class Learner:
 
       if valset is not None:
         print("\n\tValidation step:")
-        self.test(trainset, "trainset metrics:")
+        # self.test(trainset, "trainset metrics:")
         self.test(valset, "valset metrics:")
 
     print(f"\nTraining complete. It took: {format_time(time.time() - t_gral)}")
