@@ -25,7 +25,6 @@ class Learner:
                device="cpu"):
     
     self.model = classifier
-    self.optimizer = t.optim.Adam(self.model.parameters(), **optimizer_params)
     self.scheduler_params = scheduler_params
     self.device = device
 
@@ -33,6 +32,7 @@ class Learner:
     self.criterion_polarity = OrdinalLoss(class_weights_polarity, criterion_params_polarity) 
     self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **criterion_params_town)    
     self.criterion_main = AutomaticWeightedLoss(num=3)
+    self.optimizer = t.optim.Adam(self.model.parameters() + self.criterion_main.parameters(), **optimizer_params)
 
   def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2):
     t_gral = time.time()
