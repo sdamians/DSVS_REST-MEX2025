@@ -95,9 +95,6 @@ class Learner:
             scaler.update()
             scheduler.step()
             
-            print
-            { "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() }
-
             # We clean the gradients for the accumulator batch
             self.model.zero_grad()
 
