@@ -32,6 +32,7 @@ class Learner:
     self.criterion_type = nn.CrossEntropyLoss(weight=class_weights_type, **criterion_params_type)
     self.criterion_polarity = OrdinalLoss(class_weights_polarity, criterion_params_polarity) 
     self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **criterion_params_town)    
+    self.criterion_main = AutomaticWeightedLoss(num=3)
 
   def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2):
     t_gral = time.time()
@@ -73,10 +74,10 @@ class Learner:
             loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
             loss_type = self.criterion_type(outputs["logits_type"], labels_type)
             loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
-            loss = loss_type + loss_town + loss_polarity
-
+            loss = self.criterion_main(loss_town, loss_type, loss_polarity)
+            
             batch_loss += loss.item()
-            pbar.set_postfix({ "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
+            pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
             pbar.update(1)
 
           # Backpropagation
@@ -222,3 +223,46 @@ class OrdinalLoss(nn.Module):
 
     loss = F.binary_cross_entropy_with_logits(logits, cumulative_labels, **self.criterion_params)
     return loss
+  
+class AutomaticWeightedLoss(nn.Module):
+    """
+    Automatically weighted multi-task loss.
+
+    Params:
+        num: int
+            The number of loss functions to combine.
+        x: tuple
+            A tuple containing multiple task losses.
+
+    Examples:
+        loss1 = 1
+        loss2 = 2
+        awl = AutomaticWeightedLoss(2)
+        loss_sum = awl(loss1, loss2)
+    """
+    def __init__(self, num=2):
+        super(AutomaticWeightedLoss, self).__init__()
+        # Initialize parameters for weighting each loss, with gradients enabled
+        params = t.ones(num, requires_grad=True)
+        self.params = nn.Parameter(params)
+
+    def forward(self, *losses):
+        """
+        Forward pass to compute the combined loss.
+
+        Args:
+            *losses: Variable length argument list of individual loss values.
+
+        Returns:
+            torch.Tensor: The combined weighted loss.
+        """
+        loss_sum = 0
+        for i, loss in enumerate(losses):
+            # Compute the weighted loss component for each task
+            weighted_loss = 0.5 / (self.params[i] ** 2) * loss
+            # Add a regularization term to encourage the learning of useful weights
+            regularization = t.log(1 + self.params[i] ** 2)
+            # Sum the weighted loss and the regularization term
+            loss_sum += weighted_loss + regularization
+
+        return loss_sum  
