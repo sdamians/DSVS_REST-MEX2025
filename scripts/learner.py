@@ -29,7 +29,7 @@ class Learner:
     self.device = device
 
     self.criterion_type = nn.CrossEntropyLoss(weight=class_weights_type, **criterion_params_type)
-    self.criterion_polarity = OrdinalLoss(class_weights_polarity, criterion_params_polarity) 
+    self.criterion_polarity = nn.CrossEntropyLoss(class_weights_polarity, **criterion_params_polarity) 
     self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **criterion_params_town)    
     self.criterion_main = AutomaticWeightedLoss(num=3)
     self.optimizer = t.optim.Adam(self.model.parameters() + self.criterion_main.parameters(), **optimizer_params)
@@ -74,7 +74,7 @@ class Learner:
             loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
             loss_type = self.criterion_type(outputs["logits_type"], labels_type)
             loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
-            loss = self.criterion_main(loss_town, loss_type, loss_polarity)
+            loss = loss_town * 1 # self.criterion_main(loss_town, loss_type, loss_polarity)
             
             batch_loss += loss.item()
             pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
@@ -256,10 +256,13 @@ class AutomaticWeightedLoss(nn.Module):
         loss_sum = 0
         for i, loss in enumerate(losses):
             # Compute the weighted loss component for each task
-            weighted_loss = 0.5 / (self.params[i] ** 2) * loss
+            # weighted_loss = 0.5 / (self.params[i] ** 2) * loss
             # Add a regularization term to encourage the learning of useful weights
-            regularization = t.log(1 + self.params[i] ** 2)
+            # regularization = t.log(1 + self.params[i] ** 2)
             # Sum the weighted loss and the regularization term
-            loss_sum += weighted_loss + regularization
+            # loss_sum += weighted_loss + regularization
+
+            precision = t.exp(-self.params[i])
+            loss_sum += precision * loss + self.params[i]
 
         return loss_sum  

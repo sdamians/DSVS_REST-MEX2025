@@ -27,7 +27,7 @@ params = {
             },
             "town":{
                 "reduction": "mean", #sum
-                "label_smoothing": 0    
+                "label_smoothing": 0.1    
             },
             "polarity":{
                 "reduction": "mean", #sum  
