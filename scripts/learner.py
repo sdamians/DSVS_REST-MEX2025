@@ -74,7 +74,7 @@ class Learner:
             loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
             loss_type = self.criterion_type(outputs["logits_type"], labels_type)
             loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
-            loss = loss_town * 1 # self.criterion_main(loss_town, loss_type, loss_polarity)
+            loss = self.criterion_main(loss_town, loss_type, loss_polarity)
             
             batch_loss += loss.item()
             pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
