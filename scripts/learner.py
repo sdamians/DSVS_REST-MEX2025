@@ -49,7 +49,7 @@ class Learner:
         **self.scheduler_params  # Opcional: media onda de coseno (default)
     )
 
-    scaler = t.amp.GradScaler(device=self.device)
+    #scaler = t.amp.GradScaler(device=self.device)
 
     # Training mode.
     self.model.train()
@@ -69,21 +69,22 @@ class Learner:
           labels_polarity = batch["label_polarity"].to(self.device)
           labels_type = batch["label_type"].to(self.device)
 
-          with t.amp.autocast(device_type=self.device):
-            outputs = self.model(input_ids, attention_mask=attention_mask)
+          #with t.amp.autocast(device_type=self.device):
+          outputs = self.model(input_ids, attention_mask=attention_mask)
 
-            # We calculate the loss of the present minibatch
-            loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
-            loss_type = self.criterion_type(outputs["logits_type"], labels_type)
-            loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
-            loss = self.criterion_main(loss_town, loss_type, loss_polarity)
-            
-            batch_loss += loss.item()
-            pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
-            pbar.update(1)
+          # We calculate the loss of the present minibatch
+          loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
+          loss_type = self.criterion_type(outputs["logits_type"], labels_type)
+          loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
+          loss = self.criterion_main(loss_town, loss_type, loss_polarity)
+          
+          batch_loss += loss.item()
+          pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
+          pbar.update(1)
 
           # Backpropagation
-          scaler.scale(loss).backward()  # loss.backward()
+          #scaler.scale(loss).backward()  
+          loss.backward()
           
           # So we can implement gradient accumulator technique
           if (step > 0 and step % gradient_accumulator_size == 0) or (step == max_step_t - 1):
@@ -93,8 +94,9 @@ class Learner:
 
             # Update learning rate each end of epoch
             # We update the weights and bias according to the optimizer
-            scaler.step(self.optimizer)    # self.optimizer.step()
-            scaler.update()
+            #scaler.step(self.optimizer)    
+            self.optimizer.step()
+            #scaler.update()
             scheduler.step()
             
             # We clean the gradients for the accumulator batch
