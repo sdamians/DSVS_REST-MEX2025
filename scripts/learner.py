@@ -26,13 +26,18 @@ class Learner:
     
     self.model = classifier
     self.scheduler_params = scheduler_params
+    self.criterion_params_type = criterion_params_type
+    self.criterion_params_polarity = criterion_params_polarity
+    self.criterion_params_town = criterion_params_town
     self.device = device
 
-    self.criterion_type = nn.CrossEntropyLoss(weight=class_weights_type, **criterion_params_type)
-    self.criterion_polarity = nn.CrossEntropyLoss(class_weights_polarity, **criterion_params_polarity) 
-    self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **criterion_params_town)    
     self.criterion_main = AutomaticWeightedLoss(num=3)
     self.optimizer = t.optim.Adam(list(self.model.parameters()) + list(self.criterion_main.parameters()), **optimizer_params)
+
+  def adjust_criterion_weights(self, class_weights_type, class_weights_polarity, class_weights_town):
+    self.criterion_type = nn.CrossEntropyLoss(weight=class_weights_type, **self.criterion_params_type)
+    self.criterion_polarity = nn.CrossEntropyLoss(class_weights_polarity, **self.criterion_params_polarity) 
+    self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **self.criterion_params_town)
 
   def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2):
     t_gral = time.time()
@@ -74,7 +79,7 @@ class Learner:
             loss_town = self.criterion_town(outputs["logits_town"], labels_town) 
             loss_type = self.criterion_type(outputs["logits_type"], labels_type)
             loss_polarity = self.criterion_polarity(outputs["logits_polarity"], labels_polarity) 
-            loss = loss_town # self.criterion_main(loss_town, loss_type, loss_polarity)
+            loss = self.criterion_main(loss_town, loss_type, loss_polarity)
             
             batch_loss += loss.item()
             pbar.set_postfix({ "loss": loss.item(), "town": loss_town.item(), "type": loss_type.item(), "polarity": loss_polarity.item() })
