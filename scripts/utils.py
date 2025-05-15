@@ -34,9 +34,9 @@ def get_metrics(y_true, y_pred, y_proba=None, promedio='macro'):
     """
     metricas = {
         "accuracy": accuracy_score(y_true, y_pred),
-        "precision": precision_score(y_true, y_pred, average=promedio),
-        "recall": recall_score(y_true, y_pred, average=promedio),
-        "f1_score": f1_score(y_true, y_pred, average=promedio)
+        "precision": precision_score(y_true, y_pred, average=promedio, zero_division=0),
+        "recall": recall_score(y_true, y_pred, average=promedio, zero_division=0),
+        "f1_score": f1_score(y_true, y_pred, average=promedio, zero_division=0)
     }
 
     if y_proba is not None:
