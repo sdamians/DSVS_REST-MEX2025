@@ -36,7 +36,7 @@ class Learner:
     self.criterion_polarity = nn.CrossEntropyLoss(class_weights_polarity, **self.criterion_params_polarity) 
     self.criterion_town = nn.CrossEntropyLoss(weight=class_weights_town, **self.criterion_params_town)
 
-  def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2):
+  def train(self, trainset: DataLoader, valset: DataLoader, n_epochs: int, gradient_accumulator_size: int=2, warmup=0.1):
     t_gral = time.time()
 
     max_step_t = len(trainset)
@@ -44,7 +44,7 @@ class Learner:
     
     scheduler = get_cosine_schedule_with_warmup(
         self.optimizer,
-        num_warmup_steps=int(0.1 * total_training_steps),  # Warmup del 10%
+        num_warmup_steps=int(warmup * total_training_steps),  # Warmup del 10%
         num_training_steps=(total_training_steps),
         **self.scheduler_params  # Opcional: media onda de coseno (default)
     )
